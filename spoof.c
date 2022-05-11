@@ -38,6 +38,8 @@ int main(int argc, char **argv) {
 
     spoof(&dest_addr, &spoof_addr);
 
+    return 0;
+
 }
 
 void fill_hdr(struct ip *ip_header, struct udphdr *udp_header, struct sockaddr_in *src_addr, struct sockaddr_in *dst_addr, int datalen) {
@@ -50,7 +52,7 @@ void fill_hdr(struct ip *ip_header, struct udphdr *udp_header, struct sockaddr_i
     ip_header->ip_len   = htons(sizeof(struct ip) + sizeof(struct udphdr) + datalen);
     ip_header->ip_id    = 0;
     ip_header->ip_off   = 0; // fragment offset, RFC 791
-    ip_header->ip_ttl   = IPDEFTTL; // time to live, default 60
+    ip_header->ip_ttl   = IPDEFTTL; // time to live, default 64
     ip_header->ip_p     = IPPROTO_UDP;
     ip_header->ip_sum   = 0; // set by kernel
 
@@ -78,7 +80,7 @@ void choose_ip_addr(struct sockaddr_in *spoof_addr) {
         if (bool) printf("\nip invalid format, please try again: ");
         memset(ip, 0, 15);
         fgets(ip, 15, stdin);
-    } while(bool = (spoof_addr->sin_addr.s_addr = inet_addr(ip)) == (in_addr_t) -1);
+    } while((bool = (spoof_addr->sin_addr.s_addr = inet_addr(ip)) == (in_addr_t) -1));
 
     // no need to check for unsigned short since it cannot get out of range because of its type
 
@@ -104,7 +106,7 @@ void spoof(struct sockaddr_in *dest, struct sockaddr_in *spoof) {
 
     int sockfd = socket(AF_INET,        // use IPV4
                         SOCK_RAW,       // allows us to craft our own protocol header
-                        IPPROTO_RAW);   // we supply all the headers from the IP layer to the highest we are using
+                        IPPROTO_RAW);   // we supply all the headers from the IP layer to the highest layer we are using
 
 
     while (TRUE) {
